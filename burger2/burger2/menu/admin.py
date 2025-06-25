@@ -31,10 +31,24 @@ class Category_of_rollAdmin(admin.ModelAdmin):
     list_display = ['id', 'name_ru', 'name_en', 'name_tk']
     filter_horizontal = ('rolls', )
 
+@admin.register(Roll)
+class RollAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_ru', 'name_en', 'name_tk', 'image']
+    filter_horizontal = ('category_of_roll', )
+
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
     list_display = ['id', 'picture', 'urls_of_add']
     def picture(self, obj: Banner):
+        try:
+            return format_html('<img src="{obj.image.url}" width="150px" height="150px" />')
+        except:
+            return None
+
+@admin.register(Imgae_of_Stories)
+class Imgae_of_StoriesAdmin(admin.ModelAdmin):
+    list_display = ['id', 'picture']
+    def picture(self, obj: Imgae_of_Stories):
         try:
             return format_html(f'<img src="{obj.image.url}" width="150px" height="150px" />')
         except:
@@ -42,46 +56,38 @@ class BannerAdmin(admin.ModelAdmin):
 
 @admin.register(Stories)
 class StoriesAdmin(admin.ModelAdmin):
-    list_display = ['id','name_ru','name_en','name_tk','picture','picture2']
-    def picture(self, obj: Stories):
-        try:
-            return format_html(f'<img src="{obj.image.url}" width="150px" height="150px" />')
-        except:
-            return None
-    def picture2(self, obj: Stories):
-        try:
-            return format_html(f'<img src="{obj.image2.url}" width="150px" height="150px" />')
-        except:
-            return None
+    list_display = ['id']
+    filter_horizontal = ('image_of_stories', )
 
 @admin.register(Order_Cart)
 class Order_CartAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phone_number', 'adress', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id', 'phone_number', 'adress', 'get_total', 'display_food_list_with_quantity']
     inlines = [Order_CartItemInline]
 
-    def Список_заказов_Блюда_и_его_количество(self, obj):
+    def display_food_list_with_quantity(self, obj):
         food_items = []
         for item in obj.cart_items.all():
-            food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
+            food_items.append(f"{item.food.name_ru} (Qty: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phone_number', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id', 'phone_number', 'get_total', 'display_food_list_with_quantity']
     inlines = [OrderItemInline]
 
-    def Список_заказов_Блюда_и_его_количество(self, obj):
+    def display_food_list_with_quantity(self, obj):
         food_items = []
         for item in obj.order_items.all():
-            food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
+            food_items.append(f"{item.food.name_ru} (Qty: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")
 
 @admin.register(Table_creat_order)
 class Table_create_orderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'table_number', 'phone_number', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id', 'table_number', 'phone_number', 'get_total', 'display_food_list_with_quantity']
     inlines = [TableOrderItemInline]
 
-    def Список_заказов_Блюда_и_его_количество(self, obj):
+    def display_food_list_with_quantity(self, obj):
         food_items = []
         for item in obj.table_items.all():
-            food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
+            food_items.append(f"{item.food.name_ru} (Qty: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")

@@ -12,25 +12,33 @@ class CategoriesSerializars(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-class Roll_detailsSerializer(serializers.ModelSerializer):
+class Categories_of_RollSerializers(serializers.ModelSerializer):
     rolls = FoodSerializers(many=True, read_only=True)
     class Meta:
         model = Category_of_roll
         fields = '__all__'
 
-class Roll_listSerializer(serializers.ModelSerializer):
+class RollSerializers(serializers.ModelSerializer):
+    category_of_roll = Categories_of_RollSerializers(many=True, read_only=True)
     class Meta:
-        model =  Category_of_roll
-        fields = ['id','name_ru','name_tk','name_en']
+        model = Roll
+        fields = '__all__'
+
 class BannerSerializers(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = ['image', 'urls_of_add']
 
+class StoriesImageSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Imgae_of_Stories
+        fields = ['image']
+
 class StoriesSerializers(serializers.ModelSerializer):
+    image_of_stories = StoriesImageSerializers(many=True, read_only=True)
     class Meta:
         model = Stories
-        fields = '__all__'
+        fields = ['image_of_stories']
 
 class OrderItemSerializer(serializers.Serializer):
     food_id = serializers.IntegerField()

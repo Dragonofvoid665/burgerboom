@@ -17,15 +17,11 @@ class BannerView(ListAPIView):
 class StoriesView(ListAPIView):
     queryset = Stories.objects.all()
     serializer_class = StoriesSerializers
-class Roll_listView(ListAPIView):
-    queryset = Category_of_roll.objects.all()
-    serializer_class = Roll_listSerializer
 
-@api_view(['GET'])
-def Roll_detail(request,roll_id):
-    roll  = get_object_or_404(Category_of_roll,id=roll_id)
-    serializer = Roll_detailsSerializer(roll,context={'request': request})
-    return Response(serializer.data)
+class RollView(ListAPIView):
+    queryset = Roll.objects.all()
+    serializer_class = RollSerializers
+
 @api_view(['GET'])
 def Fooddetail(request,food_id):
     foods = get_object_or_404(Food,id=food_id)

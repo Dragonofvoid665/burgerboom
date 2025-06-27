@@ -50,7 +50,7 @@ class StoriesAdmin(admin.ModelAdmin):
             return None
     def picture2(self, obj: Stories):
         try:
-            return format_html(f'<img src="{obj.image2.url}" width="150px" height="150px" />')
+            return format_html(f'<img src="{obj.circle.url}" width="150px" height="150px" />')
         except:
             return None
 

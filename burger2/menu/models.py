@@ -168,7 +168,7 @@ class Stories(models.Model):
         verbose_name='Фотография для кружка',
         default='static/image/1.jpg',
         )
-    image2 = models.ImageField(
+    circle = models.ImageField(
         upload_to='static/image', 
         blank=False, 
         null=False,

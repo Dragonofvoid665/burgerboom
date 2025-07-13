@@ -1,7 +1,7 @@
+from django.contrib.admin import AdminSite
 from django.contrib import admin
 from menu.models import *
 from django.utils.html import format_html
-
 class Order_CartItemInline(admin.TabularInline):
     model = Order_CartItem
     extra = 1  
@@ -54,9 +54,14 @@ class StoriesAdmin(admin.ModelAdmin):
         except:
             return None
 
-@admin.register(Order_Cart)
+class OrdersAdminSite(AdminSite):
+    site_header = "Админ-панель заказов"
+    site_title = "Портал администрирования заказов"
+    index_title = "Добро пожаловать в админ-панель заказов"
+
+orders_admin_site = OrdersAdminSite(name='orders_admin')
 class Order_CartAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phone_number', 'adress', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id', 'phone_number', 'adress', 'get_total', 'Список_заказов_Блюда_и_его_количество']
     inlines = [Order_CartItemInline]
 
     def Список_заказов_Блюда_и_его_количество(self, obj):
@@ -64,9 +69,8 @@ class Order_CartAdmin(admin.ModelAdmin):
         for item in obj.cart_items.all():
             food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")
-@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phone_number', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id', 'phone_number', 'get_total', 'Список_заказов_Блюда_и_его_количество']
     inlines = [OrderItemInline]
 
     def Список_заказов_Блюда_и_его_количество(self, obj):
@@ -75,9 +79,8 @@ class OrderAdmin(admin.ModelAdmin):
             food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")
 
-@admin.register(Table_creat_order)
 class Table_create_orderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'table_number', 'phone_number', 'Общая_стоимость', 'Список_заказов_Блюда_и_его_количество']
+    list_display = ['id','first_name', 'table_number', 'phone_number', 'get_total', 'Список_заказов_Блюда_и_его_количество']
     inlines = [TableOrderItemInline]
 
     def Список_заказов_Блюда_и_его_количество(self, obj):
@@ -85,3 +88,8 @@ class Table_create_orderAdmin(admin.ModelAdmin):
         for item in obj.table_items.all():
             food_items.append(f"{item.food.name_ru} (количество: {item.quantity})")
         return ", ".join(food_items[:5]) + ("..." if len(food_items) > 5 else "")
+    
+
+orders_admin_site.register(Order, OrderAdmin)
+orders_admin_site.register(Order_Cart, Order_CartAdmin)
+orders_admin_site.register(Table_creat_order, Table_create_orderAdmin)

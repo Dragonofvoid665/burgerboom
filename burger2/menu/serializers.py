@@ -89,7 +89,7 @@ class Tabel_create_orderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Table_creat_order
-        fields = ['table_number', 'phone_number', 'items', 'list_of_foods', 'total']
+        fields = ['table_number','first_name','phone_number', 'items', 'list_of_foods', 'total']
 
     def get_total(self, obj):
         return obj.get_total()

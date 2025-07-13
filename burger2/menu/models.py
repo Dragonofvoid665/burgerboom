@@ -1,5 +1,17 @@
 from django.db import models
 
+class SVGImageField(models.FileField):
+    def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
+        super().__init__(upload_to=upload_to, storage=storage, **kwargs)
+        self.verbose_name = verbose_name
+        self.name = name
+
+    def formfield(self, **kwargs):
+        from .forms import SVGFormImageField
+        defaults = {'form_class': SVGFormImageField}
+        defaults.update(kwargs)
+        return super().formfield(**defaults)
+
 class Food(models.Model):
     name_ru = models.CharField(
         max_length=100, 
@@ -43,7 +55,7 @@ class Food(models.Model):
         default=1,
         verbose_name='Порция или количиство',
         )  
-    image = models.ImageField(
+    image = SVGImageField(
         upload_to='static/image', 
         blank=False,
         null=False,
@@ -81,7 +93,7 @@ class Category(models.Model):
         blank=False,
         verbose_name='Название на Туркменском',
         )
-    image = models.ImageField(
+    image = SVGImageField(
         upload_to='static/image', 
         blank=False, null=False, 
         default='image/1.jpg',
@@ -123,7 +135,7 @@ class Category_of_roll(models.Model):
         verbose_name = "Ролл"
         verbose_name_plural = "Роллы"
 class Banner(models.Model):
-    image = models.ImageField(
+    image = SVGImageField(
         upload_to='static/image', 
         blank=False, 
         null=False,
@@ -161,7 +173,7 @@ class Stories(models.Model):
         verbose_name='Название на Туркменском',
         default='ru',
         )
-    image = models.ImageField(
+    image = SVGImageField(
         upload_to='static/image', 
         blank=False, 
         null=False,
@@ -208,6 +220,12 @@ class Order_CartItem(models.Model):
         )
 
 class TableOrderItem(models.Model):
+    first_name = models.CharField(
+        max_length=150,
+        null=False,
+        blank=False,
+        default='wrvrv',
+    )
     table_order = models.ForeignKey(
         'Table_creat_order', 
         on_delete=models.CASCADE, 
@@ -240,7 +258,7 @@ class Order_Cart(models.Model):
         related_name='list_of_foods',
         verbose_name='Список блюд заказа',
         )
-    def Общая_стоимость(self):
+    def get_total(self):
         return sum(item.food.price * item.quantity for item in self.cart_items.all())
     class Meta:
         verbose_name = "Заказ на вынос"
@@ -258,12 +276,18 @@ class Order(models.Model):
         related_name='list_of_food',
         verbose_name='Список блюд заказа',
         )
-    def Общая_стоимость(self):
+    def get_total(self):
         return sum(item.food.price * item.quantity for item in self.order_items.all())
     class Meta:
         verbose_name = "Заказ на самовынос"
         verbose_name_plural = "Заказ на самовынос"
 class Table_creat_order(models.Model):
+    first_name = models.CharField(
+        max_length=150,
+        null=False,
+        blank=False,
+        default='wrvrv',
+    )
     table_number = models.PositiveBigIntegerField(
         null=False, 
         blank=False,
@@ -281,7 +305,7 @@ class Table_creat_order(models.Model):
         related_name='food_list',
         verbose_name='Список блюд заказа',
         )
-    def Общая_стоимость(self):
+    def get_total(self):
         return sum(item.food.price * item.quantity for item in self.table_items.all())
     class Meta:
         verbose_name = "Заказ на столик"
